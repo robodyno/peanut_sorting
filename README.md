@@ -1,19 +1,16 @@
-# peanut_sorting
- peanut sorting with robodyno parallel manipulator
+## Experimental environment
 
-## 标题
-- 1
-- 2
+    1. Hardware
+        Jetson nano B01,robodyno motor two arm parallel manipulator
+    2. Software：
+        - main:
+            **ros:kinetic**
+            **Jetson nano B01:native imageubuntu18.04**
+        - other:
+            **[title](https://www.baidu.com)**
 
-1. 11
-2. 22
+## Experimental function
+    peanut sorting with robodyno parallel manipulator
+    notice:
 
-> test
-
-`void main()`
-
-``` c++
-def test:
-    print('hello')
-
-```
+## instructions
