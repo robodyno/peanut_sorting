@@ -1,6 +1,6 @@
 ## Experimental environment
 1. Hardware:
-    **Jetson nano B01,robodyno motor two axis parallel manipulator**
+    **Jetson nano B01,robodyno motor two arm parallel manipulator**
 2. Software：
     - main:
         **ros:kinetic**
@@ -13,17 +13,7 @@
    notice:
 
 ## instructions
-    
-
-1. 11
-2. 22
-
-> test
-
-`void main()`
-
-``` c++
-def test:
-    print('hello')
-
-```
+1. first step:
+2. second step:
+3. third step:
+...
