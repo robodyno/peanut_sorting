@@ -34,13 +34,8 @@ class DoubleArm(Robot):
             self.device('M3'),
             self.device('M4'),
         ]
-        #for motor in self.motors:
-        #    motor.position_filter_mode(8)
         self._zeros = [0 for i in range(4)]
         self._poses = [0 for i in range(4)]
-        #self._steppers_poses = 0
-        #self._steppers_zeros = 0
-        #self.stepper = self.add_device('peanutstep', StepperBoardFactory(), 0x22, reduction = 10)
         
     def init(self):
         for i in range(3):
@@ -54,11 +49,8 @@ class DoubleArm(Robot):
             self._zeros[i] = pos
             self._poses[i] = 0
             print("i:",i)
-        #self._steppers_zeros = self.stepper.get_pos(0.3)
-        #self._steppers_poses = 0
-        #print("steppers_zeros_init:",self._steppers_position," _steppers_poses:",self._steppers_poses)
 
-    #get motor position information
+    #get motor position
     def get_motor_position_message(self):
         for i in range(4):
             print("motor","i",self.motors[i].get_pos(0.3) )
@@ -86,20 +78,20 @@ class DoubleArm(Robot):
     def home(self, dur = 5):
         self.move_to_axis((0,0,0), dur)
 
-    #-------------------------------------------------------------------------电机进入滤波模式
+    #Motor enters filter mode
     def set_position_fliter_mode(self, i, flash_hz):
         self.motors[i].position_filter_mode(flash_hz)
 
-    #-------------------------------------------------------------------------获取电机控制模式信息（直接位置、匀加/减速模式......）
+    #Obtain motor control mode information
     def get_motor_mode(self,i):
         print(self.motors[i].get_controller_modes(1))
     
-    #-------------------------------------------------------------------------设置电机速度及电流上限
+    #Set the upper limit of motor speed and current
     def set_motor_vel_inter(self, _input_max_vel, _input_max_i):
         for i in range(2):
             self.motors[i].set_limits(_input_max_vel, _input_max_i)
 
-    #-------------------------------------------------------------------------读取电机速度及电流上限
+    #Read the upper limit of motor speed and current
     def read_motor_get_limits(self):
         self.motors[0].get_limits(1)
         self.motors[1].get_limits(1)
@@ -107,7 +99,8 @@ class DoubleArm(Robot):
         print("motor0:", self.motors[0].get_limits(1))
         time.sleep(1)
         print("motor1:", self.motors[1].get_limits(1))
-    #-------------------------------------------------------------------------读取电机（速度、加速度大小、减速度大小）信息
+
+    #Get motor information(uniform velocity, acceleratin, deceleration)
     def set_motor_get_traj_mode_params(self):
         self.motors[0].get_traj_mode_params()
         self.motors[1].get_traj_mode_params()
@@ -116,7 +109,7 @@ class DoubleArm(Robot):
         time.sleep(1)
         print("motor1:", self.motors[1].get_traj_mode_params())
     
-    #-------------------------------------------------------------------------读取电机控制模式信息
+    #Read motor control mode information
     def read_get_motor_mode(self):
         self.motors[0].get_controller_modes(1)
         self.motors[1].get_controller_modes(1)
@@ -125,7 +118,7 @@ class DoubleArm(Robot):
         time.sleep(1)
         print("motor1_mode:", self.motors[1].get_controller_modes(1)) 
     
-    #-------------------------------------------------------------------------设置电机匀速、加速度大小、减速度大小
+    #Set motor velocity(uniform velocity, acceleration, deceleration)
     def write_position_traj_mode(self, whichmotor, vel, acc_up, acc_down):
         self.motors[whichmotor].position_traj_mode(vel, acc_up, acc_down)
         print("motor",whichmotor," set sucessfully!")
@@ -133,28 +126,28 @@ class DoubleArm(Robot):
         
     def peanut_jump(self, jump_numbers):
         if jump_numbers == 0:
-            #self.set_motor_pos(self._zeros[2])
             self.motors[2].set_pos(self._zeros[2])
         else:
             for current_number in range(jump_numbers):
                 self._poses[2] = self._poses[2] + 3.1415*2
                 self.set_motor_pos(2,self._poses[2])
     
-    #-------------------------------------------------------------------------设置步进电机细分、最大速度、加速度大小
+    #Set stepper motor subdivision, max speed, acceleration
     def set_stepper_vel_acc_limit(self, _input_xifen, max_stepperspeed, acc_stepper):
         self.motors[3].set_subdivision(_input_xifen) 
         self.motors[3].set_vel_acc_limit( max_stepperspeed , acc_stepper )
 
-    #-------------------------------------------------------------------------设置步进电机位置
+    #Set stepper motor position
     def stepper_position(self, _input_pos):
         self.motors[3].set_pos(_input_pos + self._zeros[3])
-        self._poses[3] = _input_pos    
-    #-------------------------------------------------------------------------步进电机复位
+        self._poses[3] = _input_pos
+
+    #Reset stepper motor
     def stepper_position_reset(self):
         self.motors[3].set_pos(self._zeros[3])
-        
+    
+    #Motion of two axis parallel manipulator
     def input_position_message(self,point_x, point_y):
-        ########################################################################calculate motor 0x12 degree
         if (point_x < -37) or (point_x > 37) or (point_y < 30) or (point_y > 70):
             print( "Sorry, data is wrong!" )
             print(" Check your data of input,please ")
@@ -187,11 +180,7 @@ class DoubleArm(Robot):
                 arm_AC = math.sqrt( point_y*point_y + (point_x+arm_AO)*(point_x+arm_AO) )
                 arm_CE = math.sqrt( point_y*point_y + (point_x-arm_AO)*(point_x-arm_AO) )                
             else:
-                print("warning:data is not exit!")
-                print("warning:data is not exit!!")
-                print("warning:data is not exit!!!")
-                print("Now, you need check your data,please!")
-            
+                print("The input parameters are incorrect. Please check whether the parameters are correct")
             cos_CAB= (arm_AB*arm_AB + arm_AC*arm_AC - arm_BC*arm_BC) / (2*arm_AB*arm_AC)
             angle_CAB= math.acos(cos_CAB)
 
@@ -205,17 +194,13 @@ class DoubleArm(Robot):
             cos_CED= (arm_CE*arm_CE + arm_DE*arm_DE - arm_CD*arm_CD) / (2*arm_CE*arm_DE)
             angle_CED=math.acos(cos_CED)
             angle_DEG=math.pi-angle_CED-angle_CEA
-            #print("angle_BAF:", angle_BAF, "angle_DEG:", angle_DEG)
             rad_to_angle_baf= (180/math.pi)*angle_BAF
             rad_to_angle_deg= (180/math.pi)*angle_DEG
-            #print("-----------------------------------")
-            #print("motor_12_angle:",rad_to_angle_baf)
-            #print("motor_13_angle:",rad_to_angle_deg)
             self.motors[0].set_pos(angle_BAF + self._zeros[0])
             self.motors[1].set_pos(angle_DEG + self._zeros[1])
             #print("step_now:",step_now)
 
-    # 圆 方 法     
+    #circle method one
     def peanum_arm_move(self, left_point, right_point, delta_point, high_point, stepper_ups, stepper_downs, stepper_delay):
         global keng,theta,step_now
         list = np.arange( left_point, right_point, delta_point )
@@ -284,7 +269,7 @@ class DoubleArm(Robot):
 
             
             
-    # 圆 方 法     
+    #circle method two    
     def peanum_arm_move_first(self, left_point, right_point, delta_point, high_point, stepper_ups, stepper_downs, stepper_delay):
         global keng,theta,step_now
         list = np.arange( left_point, right_point, delta_point )
@@ -333,7 +318,7 @@ class DoubleArm(Robot):
         print("end")
             
             
-    # 左 右 摆 动 方 法
+    #swing left and right
     def peanum_arm_move_second(self, left_point, right_point, delta_point, high_point, stepper_ups, stepper_downs, stepper_delay, arm_delay,delta_point_one, counts):
         global keng,theta,step_now
         self.set_position_fliter_mode(0,4)
